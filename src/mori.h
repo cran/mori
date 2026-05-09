@@ -8,12 +8,26 @@
 #include <stdint.h>
 #include <string.h>
 
+// Identifier grammar constants ------------------------------------------------
+
+#define MORI_NAME_MAX        30                /* size of mori_shm.name; fits Windows worst case (Local\\mori_<8hex>_<8hex> = 28) + NUL with 1 byte slack, and lands name_len in mori_shm's natural tail padding (sizeof = 48 POSIX / 56 Windows) */
+#define MORI_MAX_PATH        64                /* max indices in a path */
+#define MORI_IDENTIFIER_MAX  1024              /* parser input length cap */
+#define MORI_FORMAT_BUFLEN   1024              /* formatter stack buffer */
+
+#ifdef _WIN32
+#define MORI_PREFIX_LITERAL  "Local\\mori_"
+#else
+#define MORI_PREFIX_LITERAL  "/mori_"
+#endif
+
 // Types -----------------------------------------------------------------------
 
 typedef struct mori_shm_s {
   void *addr;
   size_t size;
-  char name[48];
+  char name[MORI_NAME_MAX];
+  uint8_t name_len;                /* strlen(name); fits since MORI_NAME_MAX < 256 */
 #ifdef _WIN32
   void *handle;
 #endif
@@ -43,7 +57,7 @@ typedef struct mori_list_view_s {
 int mori_shm_create(mori_shm *shm, size_t size);
 int mori_shm_open(mori_shm *shm, const char *name);
 void mori_shm_close(mori_shm *shm, int unlink);
-mori_shm *mori_shm_create_heap(size_t size);
+int mori_shm_create_heap(mori_shm **out, size_t size);
 mori_shm *mori_shm_open_heap(const char *name);
 void mori_shm_finalizer(SEXP ptr);
 void mori_host_finalizer(SEXP ptr);

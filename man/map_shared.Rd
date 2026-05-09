@@ -7,14 +7,18 @@
 map_shared(name)
 }
 \arguments{
-\item{name}{a character string name identifying the shared memory
-region, as returned by \code{\link[=shared_name]{shared_name()}}.}
+\item{name}{a character string as returned by \code{\link[=shared_name]{shared_name()}}: either a
+bare shared memory name (opens the root) or a name with a 1-based
+bracketed index path (e.g. \code{"/mori_abc_1[2,3]"}, opens the addressed
+sub-list or element directly).}
 }
 \value{
-The R object stored in the shared memory region, or \code{NULL} if
-\code{name} is not a valid shared memory name (wrong type, length, \code{NA},
-or missing the \code{mori} prefix). If \code{name} is well-formed but the
-region is absent or corrupted, an error is raised.
+The R object stored at the named region (or sub-object at the
+given path), or \code{NULL} if \code{name} is not a valid shared memory name
+(wrong type, length, \code{NA}, missing or malformed prefix, or malformed
+bracketed path). If \code{name} parses as valid but the region is absent or
+corrupted — or the path doesn't address a valid sub-object — an error
+is raised.
 }
 \description{
 Open a shared memory region identified by a name string and return an
@@ -28,6 +32,6 @@ sum(y)
 
 }
 \seealso{
-\code{\link[=share]{share()}} to create a shared object, \code{\link[=shared_name]{shared_name()}} to
-extract the name.
+\code{\link[=share]{share()}} to create a shared object, \code{\link[=shared_name]{shared_name()}} to extract
+the shared memory name.
 }
